@@ -1,19 +1,46 @@
 "use server";
 
+import { cloudinary } from "@/lib/utils";
 import { GoogleGenAI, Modality } from "@google/genai";
 import { rejects } from "assert";
-import { v2 as cloudinary } from "cloudinary";
-import { resolve } from "path";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 const defaultMessage =
-  "Create a 30 second long ADVENTURE STORY video script. Include AI imageprompts in FANTASY FORMAT for each scene in realistic format. Provide the result in JSON format with 'image' and 'text' fields.";
+  `You are a JSON generator.
+
+TASK:
+Write a 30-second fantasy adventure story as an array of scenes.
+
+OUTPUT RULES:
+1. Output ONLY valid JSON. No markdown, no explanations, no comments.  
+2. Each element MUST follow this schema exactly:
+   {
+     "image": "A cinematic fantasy image description (no prefixes like 'AI image prompt:', no style tags, no comic references, no 'Style:', no narrator notes).",
+     "text": "Plain narration text only. No SOUND:, no timestamps, no narrator labels, no stage directions."
+   }
+3. The JSON must be an array of 3–5 scenes, enough for ~30 seconds of spoken narration.  
+4. "image" should always describe a single cinematic fantasy scene (realistic, detailed, immersive).  
+5. "text" should always be plain narration, flowing naturally like a story read aloud.  
+6. Do not output extra fields, explanations, or formatting outside the JSON.  
+7. If you cannot follow the schema, output: []  
+
+EXAMPLE (correct):
+[
+  {
+    "image": "Fantasy forest with glowing mushrooms, ancient stone ruins covered in vines, mist in the air, cinematic lighting, hyper-realistic",
+    "text": "The young adventurer entered the forgotten woods, each step echoing with secrets of the past."
+  },
+  {
+    "image": "A crystal river reflecting moonlight, magical creatures watching from the shadows, enchanted atmosphere",
+    "text": "Legends spoke of a river that revealed hidden truths to those brave enough to cross."
+  },
+  {
+    "image": "Towering mountain with a glowing peak, storm clouds swirling above, epic scale, realistic fantasy painting",
+    "text": "At the journey’s end stood the mountain of fate, where destiny awaited the chosen one."
+  }
+]
+`;
 
 export const createVideo = async (message: string = defaultMessage) => {
   try {
@@ -56,7 +83,7 @@ export const generateImage = async (prompts: string) => {
           cloudinary.uploader
             .upload_stream(
               { resource_type: "image", folder: "ai-images" },
-              (error, result) => {
+              (error: any, result: any) => {
                 if (error) {
                   reject(error);
                 } else {

@@ -1,6 +1,9 @@
 "use client";
 
+import { createCaption } from "@/actions/assemblyai";
 import { createVideo, generateImage } from "@/actions/gemini";
+import { createAudio } from "@/actions/murf";
+import { VideoScript } from "@/lib/types";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 const initialState = {
@@ -83,9 +86,9 @@ export const VideoProvider = ({ children }: { children: ReactNode }) => {
           console.log(res.data);
           // const scriptData = JSON.parse(res.data!);
           const scriptData = res.data;
-          console.log("heyyy if")
+          
           const imagePromises = scriptData.map(
-            async (item: { image: string; text: string }) => {
+            async (item: VideoScript) => {
               console.log("item in img promis", item)
               try {
                 const imageRes = await generateImage(item.image);
@@ -100,8 +103,11 @@ export const VideoProvider = ({ children }: { children: ReactNode }) => {
             (img) => img !== undefined || img !== null
           );
           setImages(validImages);
+          const audioUrl = await generateAudio(scriptData)
+          await generateCaption(audioUrl!)
         }
       }
+
     } catch (error) {
       console.log("Error in handleSubmit:", error);
       setLoadingMessage("Error generating images.");
@@ -111,6 +117,38 @@ export const VideoProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const generateAudio = async (script: VideoScript[]) =>{
+    setLoading(true)
+    setLoadingMessage("Generating audio from script")
+    try {
+      const scriptText = script.map((item)=> item.text).join(" ")
+      const audio = await createAudio(scriptText)
+      if(audio){
+        setAudio(audio)
+        return audio
+      }
+      
+    } catch (error) {
+      console.log(error)
+    } finally{
+      setLoading(false)
+      setLoadingMessage("")
+    }
+  }
+
+  const generateCaption = async (audioUrl: string) => {
+    setLoading(true)
+    try {
+      const transcript = await createCaption(audioUrl)
+      if(transcript) setCaptions(transcript)
+        
+      
+    } catch (error) {
+      console.log(error)
+      setLoadingMessage("An error occured while generating Captions")
+    }
+  }
+  
   return (
     <VideoContext.Provider
       value={{

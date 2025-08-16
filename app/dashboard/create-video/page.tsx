@@ -3,6 +3,7 @@
 import Modal from "@/components/modal/modal";
 import { VideoContext } from "@/context/VideoProvider";
 import { storyOptions, styleOptions } from "@/lib/constants";
+import RemotionPlayer from "@/remotion/remotionPlayer";
 import { useContext } from "react";
 
 const CreateVideo = () => {
@@ -16,88 +17,116 @@ const CreateVideo = () => {
     handleSelectStyle,
     handleSubmit,
     loading,
+    captions,
+    images,
+    audio,
   } = videoContext!;
   return (
-    <div className="container mx-auto px-4 pt-20">
-      <h1 className="text-2xl font-bold mb-5">Create Your Video</h1>
-      <div>
-        <h2 className="text-lg font-semibold mb-4">
-          Select a Story Type or Enter Custom Prompt
-        </h2>
-        {/*  */}
-        {/*  */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {storyOptions.map((story) => {
-            return (
-              <div key={story.label}>
-                {story.type === "custom" ? (
-                  <>
-                    <input
-                      type="text"
-                      className="peer block h-10 w-full rounded-md border px-3 py-1 outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 "
-                      value={customPrompt}
-                      onChange={(e) =>
-                        handleCustomPromptChange(e as any)
-                      }
-                      id={story.label}
-                      placeholder="Enter custom prompt"
-                    />
-                    <label
-                      htmlFor={story.label}
-                      className="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[twe-input-state-active]:-translate-y-[0.9rem] peer-data-[twe-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-400 dark:peer-focus:text-primary"
-                    >
-                      {story.label}
-                    </label>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    className={`rounded-sm cursor-pointer bg-indigo-600 w-full h-10 text-base font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
-                      selectedStory === story.label
-                        ? "border-3 border-orange-500"
-                        : ""
-                    }`}
-                    onClick={() => handleSelectStory(story.label)}
-                  >
-                    {story.label}
-                  </button>
-                )}
-              </div>
-            );
-          })}
+    <div className="grid container mx-auto grid-cols-1 lg:grid-cols-2">
+      <div className="px-6 pt-20 bg-gradient-to-b from-gray-50 via-white to-gray-100 min-h-screen">
+  <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-900">
+    🎬 Create Your Video
+  </h1>
+
+  {/* Story Selection */}
+  <div className="max-w-4xl mx-auto">
+    <h2 className="text-xl font-semibold mb-6 text-gray-800">
+      Select a Story Type or Enter Custom Prompt
+    </h2>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {storyOptions.map((story) => (
+        <div key={story.label} className="relative">
+          {story.type === "custom" ? (
+            <>
+              <input
+                type="text"
+                id={story.label}
+                value={customPrompt}
+                onChange={(e) => handleCustomPromptChange(e as any)}
+                placeholder="Enter your own prompt..."
+                className="peer block h-12 w-full rounded-xl border border-gray-300 bg-white/70 px-4 py-2 text-sm shadow-sm outline-none transition-all placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-400"
+              />
+              <label
+                htmlFor={story.label}
+                className="absolute left-4 top-2.5 text-gray-500 text-xs transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-sm peer-focus:-top-2 peer-focus:text-indigo-600 peer-focus:text-xs"
+              >
+                {story.label}
+              </label>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={`w-full h-12 rounded-xl font-medium shadow-md transition-all duration-200 ${
+                selectedStory === story.label
+                  ? "bg-indigo-600 text-white ring-2 ring-indigo-400"
+                  : "bg-indigo-500 text-white hover:bg-indigo-600"
+              }`}
+              onClick={() => handleSelectStory(story.label)}
+            >
+              {story.label}
+            </button>
+          )}
         </div>
-      </div>
-      <div className="mt-10">
-        <h1 className="text-2xl font-bold mb-5">Select a video style</h1>
-        <div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {styleOptions.map((style)=> (
-                <div key={style.name}>
-                    <button
-                    type="button"
-                    className={`rounded-sm cursor-pointer bg-orange-500 w-full h-10 text-base font-semibold text-white shadow-xs hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 ${
-                      selectedStyle === style.name
-                        ? "border-3 border-indigo-500"
-                        : ""
-                    }`}
-                    onClick={() => handleSelectStyle(style.name)}
-                  >
-                    {style.name}
-                  </button>
-                </div>
-            ))}
-          </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Video Style */}
+  <div className="max-w-4xl mx-auto mt-14">
+    <h2 className="text-xl font-semibold mb-6 text-gray-800">
+      Select a Video Style
+    </h2>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {styleOptions.map((style) => (
+        <div key={style.name}>
+          <button
+            type="button"
+            className={`w-full h-12 rounded-xl font-medium shadow-md transition-all duration-200 ${
+              selectedStyle === style.name
+                ? "bg-orange-500 text-white ring-2 ring-orange-300"
+                : "bg-orange-400 text-white hover:bg-orange-500"
+            }`}
+            onClick={() => handleSelectStyle(style.name)}
+          >
+            {style.name}
+          </button>
         </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Submit */}
+  <div className="max-w-2xl mx-auto mt-20">
+    <button
+      type="button"
+      onClick={handleSubmit}
+      disabled={
+        !selectedStory ||
+        !selectedStyle ||
+        (selectedStory === "custom" && !customPrompt)
+      }
+      className="w-full md:w-1/2 mx-auto flex items-center justify-center h-14 rounded-2xl bg-emerald-500 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:bg-emerald-600 focus:ring-4 focus:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {loading ? (
+        <span className="animate-pulse">⏳ Generating...</span>
+      ) : (
+        "🚀 Create Video"
+      )}
+    </button>
+  </div>
+
+  <Modal />
+</div>
+
+      <div className="flex items-center justify-center h-full">
+        {captions && audio && images ? (
+          <RemotionPlayer />
+        ) : (
+          <h2>No video data found</h2>
+        )}
       </div>
-      <button
-        type="button"
-        className={`rounded-sm mt-20 mb-4 w-full cursor-pointer bg-emerald-500 md:w-1/4 block mx-auto h-14 text-base font-semibold text-white shadow-xs hover:bg-emerald-600 focus-visible:outline-2 focus-visible:outline-offset-2 `}
-        onClick={handleSubmit}
-        disabled={!selectedStory || !selectedStyle || (selectedStory === "custom" && !customPrompt)}
-      >
-        {loading ? <span className="animate-pulse ease-in-out">Loading...</span> : "Create Video"}
-      </button>
-      <Modal />
     </div>
   );
 };

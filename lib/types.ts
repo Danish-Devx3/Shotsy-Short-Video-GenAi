@@ -6,3 +6,5 @@ export type StoryOption = {
 export type StyleOption = {
   name: string;
 };
+
+export type VideoScript = {image: string; text: string}
