@@ -1,35 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shotsy - AI Powered Short Video Generator
+
+Shotsy is a web application that leverages the power of Generative AI to create short videos from user-provided text. It uses a combination of AI services to generate audio, subtitles, and video scenes.
+
+## Features
+
+- **Text-to-Speech:** Converts text into natural-sounding speech using Murf AI.
+- **Transcription and Subtitles:** Generates subtitles from the audio using AssemblyAI.
+- **Video Scene Generation:** Creates video scenes using Remotion.
+- **AI-Powered Content:** Utilizes Google Gemini for AI-powered features.
+
+## Technology Stack
+
+- **Frontend:** Next.js (React)
+- **Styling:** Tailwind CSS
+- **Video Generation:** Remotion
+- **AI Services:**
+  - Google Gemini API
+  - AssemblyAI API
+  - Murf AI API
+
+## Folder Structure
+
+```
+/
+├── actions/                # Server-side actions for AI services
+│   ├── assemblyai.ts       # AssemblyAI API calls
+│   ├── gemini.ts           # Gemini API calls
+│   └── murf.ts             # Murf AI API calls
+├── app/                    # Next.js app directory
+│   ├── dashboard/          # Dashboard pages
+│   │   └── create-video/   # Page for creating videos
+│   ├── globals.css         # Global CSS styles
+│   ├── layout.tsx          # Root layout
+│   └── page.tsx            # Landing page
+├── components/             # Reusable React components
+│   ├── loader/
+│   ├── modal/
+│   └── navbar/
+├── context/                # React context providers
+│   └── VideoProvider.tsx   # Context for video state
+├── lib/                    # Utility functions and constants
+├── public/                 # Static assets
+└── remotion/               # Remotion video components
+    ├── index.ts
+    ├── remotionPlayer.tsx
+    ├── remotionVideo.tsx
+    └── root.tsx
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v16.x or later)
+- npm, yarn, or pnpm
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone 
+   cd 
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   Create a `.env.local` file in the root of the project and add the following environment variables. You can get the API keys from the respective services.
+
+   ```bash
+   # .env.local
+   GEMINI_API_KEY=your_gemini_api_key
+   ASSEMBLYAI_API_KEY=your_assemblyai_api_key
+   MURF_API_KEY=your_murf_api_key
+   ```
+
+### Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev`: Starts the development server.
+- `npm run build`: Creates a production build.
+- `npm run start`: Starts the production server.
+- `npm run lint`: Lints the codebase.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
+## Deployment
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
