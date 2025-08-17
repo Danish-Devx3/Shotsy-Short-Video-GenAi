@@ -1,78 +1,83 @@
+"use client"
+
 import { VideoContext } from "@/context/VideoProvider";
 import { useContext } from "react";
-import {
-  AbsoluteFill,
-  Audio,
-  Img,
-  Sequence,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import { AbsoluteFill, Audio, Img, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
 
-const RemotionVideo = () => {
+const remotionVideo = ({images=[], audio="", captions=[]}) => {
   const ctx = useContext(VideoContext);
-  if (!ctx) return null;
+  const frame = useCurrentFrame()
+  const {fps} = useVideoConfig()
 
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { audio: audioUrl, images: videoImages, captions: videoCaptions } = ctx!;
+   const totalDuration = captions.length > 1
+    ? Math.ceil((captions[captions.length-1]as any).end / (1000 / 30)+30)
+    : 1
 
-  const { audio, images, captions } = ctx;
+    const currentCaption = () => {
+        const currentTime = frame/fps * 1000
+        const caption = captions.find((caption: any)=>(
+            currentTime>= caption.start && currentTime <= caption.end
+        ))
+        return caption? (caption as any).text : ""
+    }
 
-  // total video duration (in frames)
-  const totalDuration =
-    captions.length > 1
-      ? Math.ceil(
-          (captions[captions.length - 1] as any).end / (1000 / fps) + fps
-        )
-      : fps;
-
-  // helper to get caption for current time
-  const currentCaption = () => {
-    const currentTime = (frame / fps) * 1000;
-    const caption = captions.find(
-      (cap: any) => currentTime >= cap.start && currentTime <= cap.end
+    const calculateOpacity = (
+    index: number,
+    frame: number,
+    startFrame: number,
+    endFrame: number
+  ): number => {
+    // Log values for debugging
+    
+    // Ensure frames are strictly increasing
+    if (startFrame >= endFrame) {
+      console.warn("Invalid frame range:", { startFrame, endFrame });
+      return 1; // Default opacity
+    }
+    // Calculate input range for interpolation
+    const inputRange = [startFrame, startFrame + 50, endFrame - 50, endFrame];
+    // Ensure inputRange is strictly increasing
+    const uniqueInputRange = Array.from(new Set(inputRange)).sort(
+      (a, b) => a - b
     );
-    return caption ? (caption as any).text : "";
+    return index === 0
+      ? 1 // First image is fully visible
+      : interpolate(frame, uniqueInputRange, [0, 1, 1, 0]);
   };
+    
+  return <AbsoluteFill>
+    {
+        images.map((img, idx) => {
+            const startTime = (idx * totalDuration) / images.length;
+            const endTime = startTime + totalDuration;
+            const opacity = calculateOpacity(idx, frame, startTime, endTime);
+            return (
+              <Sequence
+                key={idx}
+                from={idx * totalDuration / images.length}
+                durationInFrames={totalDuration}
+              >
+                <Img
+                 src={img}
+                 style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    margin: "auto",
+                    opacity: opacity
+                 }}
+                 />
 
-  return (
-    <AbsoluteFill>
-      {images.map((img, idx) => {
-        // evenly divide duration among images
-        const sceneDuration = Math.max(
-          1,
-          Math.floor(totalDuration / images.length)
-        );
-        const startTime = idx * sceneDuration;
-
-        return (
-          <Sequence
-            key={idx}
-            from={startTime}
-            durationInFrames={sceneDuration}
-          >
-            <Img
-              src={img}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                margin: "auto",
-              }}
-            />
-
-            <AbsoluteFill className="flex items-center justify-center">
-              <h2 className="text-emerald-500 text-3xl text-center px-4">
-                {currentCaption()}
-              </h2>
-            </AbsoluteFill>
-          </Sequence>
-        );
-      })}
-
-      {audio && <Audio src={audio} />}
-    </AbsoluteFill>
-  );
+                 <AbsoluteFill>
+                    <span className=" absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-emerald-500 text-3xl font-semibold text-shadow-neutral-800-50">{currentCaption()}</span>
+                 </AbsoluteFill>
+            </Sequence>
+            )
+        })
+    }
+    <Audio src={audio}/>
+  </AbsoluteFill>;
 };
 
-export default RemotionVideo;
+export default remotionVideo;

@@ -2,6 +2,7 @@
 import { SignedIn, SignInButton, UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
+import Credits from "./Creadits";
 
 const Navbar = async () => {
   const user = await currentUser();
@@ -10,7 +11,7 @@ const Navbar = async () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl flex h-16 items-center mx-auto justify-between">
         <div className="flex items-center gap-2">
-          <Link href="/" className="text-xl font-bold">Next Video</Link>
+          <Link href="/" className="text-xl font-bold">Shotsy</Link>
         </div>
         <nav className="hidden md:flex gap-6">
           <Link
@@ -40,7 +41,7 @@ const Navbar = async () => {
             <>
               <Link href={"/dashboard"}>Dashboard</Link>
               <Link href={"/buy-credits"}>
-                Credits:60
+                <Credits/>
               </Link>
               <SignedIn>
                 <UserButton />

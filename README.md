@@ -59,8 +59,8 @@ Shotsy is a web application that leverages the power of Generative AI to create 
 
 1. **Clone the repository:**
    ```bash
-   git clone 
-   cd 
+   git clone https://github.com/Danish-Devx3/Shotsy-Short-Video-GenAi.git
+   cd Shotsy-Short-Video-GenAi
    ```
 
 2. **Install dependencies:**
