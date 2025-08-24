@@ -18,6 +18,6 @@ export const storyOptions: StoryOption[] = [
     { name: "Dark",  },
     { name: "Water color" },
     { name: "GTA" },
-    { name: "comic" },
+    { name: "Comic" },
     { name: "Paint"}
    ];

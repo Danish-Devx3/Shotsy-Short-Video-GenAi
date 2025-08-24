@@ -7,7 +7,7 @@ const Root = () => {
   return (
     <>
       <Composition 
-       id='empty'
+       id='video'
        component={remotionVideo}
        durationInFrames={60}
        fps={30}
